@@ -1,8 +1,6 @@
 package kr.hs.dgsw.network;
 
-import javax.sound.midi.Soundbank;
-
-public class Thread_main {
+public class Thread_interrupt_main {
     public static void main(String[] args){
         Thread1 t1 = new Thread1();
         Thread2 m2 = new Thread2();
