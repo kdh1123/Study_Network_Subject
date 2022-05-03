@@ -1,4 +1,6 @@
-package kr.hs.dgsw.network;
+package kr.hs.dgsw.network.lesson2;
+
+import kr.hs.dgsw.network.lesson2.Thread_WithSemaphore;
 
 public class Thread_SemaphoreMain {
 

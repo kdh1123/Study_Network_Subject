@@ -1,6 +1,6 @@
-package kr.hs.dgsw.network;
+package kr.hs.dgsw.network.lesson1;
 
-public class Thread_interrupt_main {
+public class Thread_main {
     public static void main(String[] args){
         Thread1 t1 = new Thread1();
         Thread2 m2 = new Thread2();

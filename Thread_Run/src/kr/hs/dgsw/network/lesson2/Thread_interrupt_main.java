@@ -1,8 +1,9 @@
-package kr.hs.dgsw.network;
+package kr.hs.dgsw.network.lesson2;
 
-import javax.sound.midi.Soundbank;
+import kr.hs.dgsw.network.lesson1.Thread1;
+import kr.hs.dgsw.network.lesson1.Thread2;
 
-public class Thread_main {
+public class Thread_interrupt_main {
     public static void main(String[] args){
         Thread1 t1 = new Thread1();
         Thread2 m2 = new Thread2();

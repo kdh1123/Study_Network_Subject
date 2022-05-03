@@ -1,4 +1,4 @@
-package kr.hs.dgsw.network;
+package kr.hs.dgsw.network.lesson2;
 
 public class Thread_synchronized implements Runnable{
 

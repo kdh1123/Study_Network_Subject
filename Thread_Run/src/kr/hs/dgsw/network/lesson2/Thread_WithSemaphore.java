@@ -1,4 +1,4 @@
-package kr.hs.dgsw.network;
+package kr.hs.dgsw.network.lesson2;
 import java.util.concurrent.Semaphore;
 
 public class Thread_WithSemaphore implements Runnable{
