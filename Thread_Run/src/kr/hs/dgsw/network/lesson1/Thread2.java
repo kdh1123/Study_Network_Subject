@@ -1,4 +1,4 @@
-package kr.hs.dgsw.network;
+package kr.hs.dgsw.network.lesson1;
 
 public class Thread2 implements Runnable{
     public void run() {

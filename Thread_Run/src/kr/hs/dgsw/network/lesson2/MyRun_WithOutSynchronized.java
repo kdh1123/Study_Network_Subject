@@ -1,4 +1,4 @@
-package kr.hs.dgsw.network;
+package kr.hs.dgsw.network.lesson2;
 
 public class MyRun_WithOutSynchronized implements Runnable {
 	private int i=0;

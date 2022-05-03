@@ -1,4 +1,4 @@
-package kr.hs.dgsw.network;
+package kr.hs.dgsw.network.lesson3;
 
 public class CakeMaker extends Thread {
 	private CakePlate cake;
