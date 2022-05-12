@@ -1,20 +1,22 @@
-package kr.hs.dgsw.network.lesson6;
+package kr.hs.dgsw.network.lesson7;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Scanner;
 
-public class ClientMain {
+public class ClientMain2 {
     public static void main(String[] args) {
         try {
+
             Socket sc = new Socket("10.80.161.228",5000);
 
-            OutputStream os = sc.getOutputStream();
-            PrintWriter pw = new PrintWriter(os,true);
+            Thread it = new inputThread(sc);
+            Thread ot = new outputThread(sc);
 
-            pw.println("호호");
+            it.start();
+            ot.start();
+
         } catch (UnknownHostException e){
 
         } catch (IOException e) {
@@ -22,3 +24,4 @@ public class ClientMain {
         }
     }
 }
+
