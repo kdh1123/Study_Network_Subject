@@ -1,28 +1,43 @@
 package kr.hs.dgsw.network.lesson7;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.ServerSocket;
+import java.io.*;
 import java.net.Socket;
+import java.util.*;
 
 public class inputThread extends Thread{
-    Socket sc = null;
+    private static List<inputThread> ClientList = (List<inputThread>) Collections.synchronizedList(new ArrayList<inputThread>());
 
-    public inputThread(Socket sc){
+
+    Socket sc;
+    inputThread(Socket sc) {
         this.sc = sc;
+        ClientList.add(this);
+    }
+    public void sendMassage(String msg){
+        OutputStream os = null;
+        try {
+            os = this.sc.getOutputStream();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        PrintWriter pw = new PrintWriter(os, true);
+        pw.println(msg);
     }
     public void run() {
-        while(true){
+            InputStream is = null;
+            try {
+                is = this.sc.getInputStream();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        BufferedReader br = new BufferedReader(new InputStreamReader(is));
         try {
-            InputStream is = this.sc.getInputStream();
-            BufferedReader br = new BufferedReader(new InputStreamReader((is)));
-
-            System.out.println(br.readLine());
-        } catch (IOException e) {
+            while(true){
+                for (inputThread tmpit:ClientList){
+                    tmpit.sendMassage(br.readLine());
+                }
+            }
+        } catch (IOException e ){
             e.printStackTrace();
         }
-    }
     }
 }
