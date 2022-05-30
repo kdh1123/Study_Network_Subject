@@ -23,4 +23,7 @@ public class FileSendClient {
             dos.write(bytes,0,readSize);
         }
     }
+    public void login(){
+
+    }
 }
