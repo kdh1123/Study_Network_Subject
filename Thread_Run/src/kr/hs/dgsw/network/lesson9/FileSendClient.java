@@ -5,7 +5,7 @@ import java.net.Socket;
 
 public class FileSendClient {
     public static void main(String[] args) throws IOException{
-        Socket sc = new Socket("10.80.162.206",5000);
+        Socket sc = new Socket("10.80.163.89",5000);
 
         OutputStream os = sc.getOutputStream();
         BufferedOutputStream bor = new BufferedOutputStream(os);
@@ -22,8 +22,5 @@ public class FileSendClient {
         while((readSize=fis.read(bytes)) != -1){
             dos.write(bytes,0,readSize);
         }
-    }
-    public void login(){
-
     }
 }
