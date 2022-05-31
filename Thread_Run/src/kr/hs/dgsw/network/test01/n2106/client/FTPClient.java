@@ -5,32 +5,63 @@ import java.net.Socket;
 import java.util.Scanner;
 
 public class FTPClient {
-    private final Scanner scanner;
-    private String id;
-    private String pw;
-    private String filefolder = "";
-    public FTPClient() {
-        scanner = new Scanner(System.in);
-    }
+    private static String id;
+    private static String pw;
+    private static final String filefolder = "C:/Users/DGSW/Desktop/네트워크 보낼 파일";
+    private static final int PORT = 5000;
+    private static final String IP_ADDRESS = "10.80.163.89";
+    private static final FTPClient client = new FTPClient();
 
     public static void main(String[] args) throws IOException {
-        Socket sc = new Socket("",5000);
-        FTPClient client = new FTPClient();
+        Scanner scanner = new Scanner(System.in);
+        while(true) {
+            Socket sc = new Socket(IP_ADDRESS,PORT);
+            OutputStream os = sc.getOutputStream();
+            InputStream is = sc.getInputStream();
+            BufferedOutputStream bor = new BufferedOutputStream(os);
+            DataOutputStream dos = new DataOutputStream(bor);
 
-        OutputStream os = sc.getOutputStream();
-        BufferedOutputStream bor = new BufferedOutputStream(os);
-        DataOutputStream dos = new DataOutputStream(bor);
+            System.out.println("** 서버에 접속하였습니다 **");
+            client.login(is,os);
 
-        File f1 = new File(client.filefolder);
-        FileInputStream fis = new FileInputStream(f1);
+            int readSize = 0;
+            byte[] bytes = new byte[1024];
 
-        dos.writeUTF(f1.getName());
-
-        int readSize = 0;
-        byte[] bytes = new byte[1024];
-
-        while((readSize=fis.read(bytes)) != -1){
-            dos.write(bytes,0,readSize);
+            //while ((readSize = fis.read(bytes)) != -1) {
+              //  dos.write(bytes, 0, readSize);
+            //}
+            scanner.close();
         }
+    }
+    public void upload(){
+
+    }
+    public void login( InputStream is, OutputStream os) throws IOException {
+        Scanner scanner = new Scanner(System.in);
+        PrintWriter pw = new PrintWriter(os, true);
+        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+        while(true) {
+            System.out.printf("ID : ");
+            pw.println(scanner.next());
+            System.out.printf("PASS : ");
+            pw.println(scanner.next());
+            if (br.readLine().equals("성공")){
+                System.out.printf("** FTP 서버에 접속했습니다 **");
+                break;
+            }
+            else {
+                System.out.printf("** 비밀번호 또는 아이디가 잘못되었습니다 **");
+            }
+        }
+        scanner.close();
+    }
+    public void download(){
+
+    }
+    public void fileList(){
+
+    }
+    public void exit(){
+
     }
 }
