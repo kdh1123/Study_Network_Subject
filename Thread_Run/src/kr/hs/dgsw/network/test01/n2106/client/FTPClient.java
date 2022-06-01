@@ -17,6 +17,7 @@ public class FTPClient {
         Scanner scanner = new Scanner(System.in);
         System.out.println("** 서버에 접속하였습니다 **");
         String fun;
+        String result;
         while(!client.exit(scanner)) {
             Socket sc = new Socket(IP_ADDRESS,PORT);
             OutputStream os = sc.getOutputStream();
@@ -24,12 +25,21 @@ public class FTPClient {
             BufferedOutputStream bor = new BufferedOutputStream(os);
             DataOutputStream dos = new DataOutputStream(bor);
             PrintWriter pw = new PrintWriter(os);
+            BufferedReader br = new BufferedReader(new InputStreamReader(is));
             if(!isLogin)
-            client.login(is,os);
+            client.login(pw,br,scanner);
             if(isLogin){
                 while(true){
                     fun = scanner.next();
-                    pw.println(fun.substring(1));
+                    System.out.printf(fun.substring(0,0));
+                    if(fun.substring(0,0).equals("/")){
+                        fun = fun.substring(1);
+                        pw.println(fun);
+                        System.out.println("명령 입력");
+                    }
+                    result = br.readLine();
+                    if()
+
                 }
             }
 
@@ -46,10 +56,7 @@ public class FTPClient {
     public void upload(){
 
     }
-    public void login( InputStream is, OutputStream os) throws IOException {
-        Scanner scanner = new Scanner(System.in);
-        PrintWriter pw = new PrintWriter(os, true);
-        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+    public void login(PrintWriter pw, BufferedReader br,Scanner scanner) throws IOException {
         while(true) {
             System.out.printf("ID : ");
             pw.println(scanner.next());
@@ -65,10 +72,10 @@ public class FTPClient {
             }
         }
     }
-    public void download(){
+    public void download(PrintWriter pw, BufferedReader br){
 
     }
-    public void fileList(){
+    public void fileList(PrintWriter pw, BufferedReader){
 
     }
     public boolean exit(Scanner scanner){

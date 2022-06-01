@@ -16,25 +16,44 @@ public class FTPServer {
     private static String id;
     private static String pw;
     private static boolean isExit = false;
+    private static InputStream is;
+    private static OutputStream os;
+    private static BufferedInputStream bir;
+    private static DataInputStream dis;
+    private static BufferedReader br;
+    private static PrintWriter pw;
+
 
 
     public static void main(String[] args) throws IOException {
         FTPServer server = new FTPServer();
         ServerSocket ss = new ServerSocket(5000);
         String fun;
+        String fileName;
         while (!isExit) {
             Socket sc = ss.accept();
-            InputStream is = sc.getInputStream();
-            OutputStream os = sc.getOutputStream();
-            BufferedInputStream bir = new BufferedInputStream(is);
-            DataInputStream dis = new DataInputStream(bir);
-            BufferedReader br = new BufferedReader(new InputStreamReader(is));
+            is = sc.getInputStream();
+            os = sc.getOutputStream();
+            bir = new BufferedInputStream(is);
+            dis = new DataInputStream(bir);
+            br = new BufferedReader(new InputStreamReader(is));
                 if(!isLogin) {
                     isLogin = server.login(is, os);
                 }
                 if(isLogin){
                     while(true){
                         fun = br.readLine();
+                        if(fun.equals("파일목록")){
+                            fileName = dis.readUTF();
+                            System.out.println(fileName);
+
+                        }
+                        else if(fun.equals("업로드")){
+
+                        }
+                        else if(fun.equals("다운로드")){
+
+                        }
                     }
                 }
         }
