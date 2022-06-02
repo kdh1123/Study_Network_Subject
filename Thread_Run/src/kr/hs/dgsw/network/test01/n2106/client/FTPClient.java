@@ -17,13 +17,12 @@ public class FTPClient {
     public static void main(String[] args) throws IOException {
         System.out.println("** 서버에 접속하였습니다 **");
         String fun;
+        String name, newName;
         Scanner scanner = new Scanner(System.in);
         while(true) {
             Socket sc = new Socket(IP_ADDRESS,PORT);
             OutputStream os = sc.getOutputStream();
             InputStream is = sc.getInputStream();
-            BufferedOutputStream bor = new BufferedOutputStream(os);
-            DataOutputStream dos = new DataOutputStream(bor);
             PrintWriter pw = new PrintWriter(os,true);
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
             if(!isLogin)
@@ -36,10 +35,10 @@ public class FTPClient {
                         client.fileList(is,os,fun);
                     }
                     else if(fun.equals("업로드")){
-
+                        client.upload(is,os,name,newName);
                     }
                     else if(fun.equals("다운로드")){
-
+                        client.download(is,os);
                     }
                     else if(fun.equals("접속종료")){
                         client.exit(scanner,sc);
@@ -57,8 +56,17 @@ public class FTPClient {
 
         }
     }
-    public void upload(){
-
+    public void upload(InputStream is, OutputStream os,String name){
+        BufferedOutputStream bor = new BufferedOutputStream(os);
+        DataOutputStream dos = new DataOutputStream(bor);
+    }
+    public void upload(InputStream is, OutputStream os,String name,String newName){
+        BufferedOutputStream bor = new BufferedOutputStream(os);
+        DataOutputStream dos = new DataOutputStream(bor);
+    }
+    public void download(InputStream is, OutputStream os){
+        BufferedOutputStream bor = new BufferedOutputStream(os);
+        DataOutputStream dos = new DataOutputStream(bor);
     }
     public void login(InputStream is, OutputStream os, Scanner scanner) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(is));
@@ -80,9 +88,6 @@ public class FTPClient {
             }
         }
     }
-    public void download(){
-
-    }
     public void fileList(InputStream is, OutputStream os, String fun) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(is));
         PrintWriter pw = new PrintWriter(os,true);
@@ -97,7 +102,7 @@ public class FTPClient {
         };
         System.out.println("** 총 "+fileList.length+"개의 파일 **");
     }
-    public void exit(Scanner scanner,Socket sc){
+    public void exit(Scanner scanner,Socket sc) throws IOException {
         scanner.close();
         sc.close();
         System.out.println("** 접속이 종료되었습니다 **");
