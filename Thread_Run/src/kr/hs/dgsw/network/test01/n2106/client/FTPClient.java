@@ -17,7 +17,6 @@ public class FTPClient {
     public static void main(String[] args) throws IOException {
         System.out.println("** 서버에 접속하였습니다 **");
         String fun;
-        String result;
         Scanner scanner = new Scanner(System.in);
         while(true) {
             Socket sc = new Socket(IP_ADDRESS,PORT);
@@ -31,14 +30,10 @@ public class FTPClient {
             client.login(is,os,scanner);
             if(isLogin){
                 while(true){
-                    System.out.print("명령어 입력 : ");
                     fun = scanner.next();
                     if(fun.substring(0,1).equals("/")) fun = fun.substring(1);
-                    System.out.println(fun);
                     if(fun.equals("파일목록")){
-                        pw.println(fun);
-                        result = br.readLine();
-                        System.out.println(result);
+                        client.fileList(is,os,fun);
                     }
                     else if(fun.equals("업로드")){
 
@@ -47,7 +42,7 @@ public class FTPClient {
 
                     }
                     else if(fun.equals("접속종료")){
-                        client.exit(scanner);
+                        client.exit(scanner,sc);
                     }
                 }
             }
@@ -88,11 +83,23 @@ public class FTPClient {
     public void download(){
 
     }
-    public void fileList(){
-
+    public void fileList(InputStream is, OutputStream os, String fun) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+        PrintWriter pw = new PrintWriter(os,true);
+        pw.println(fun);
+        String result;
+        System.out.println("** File List **");
+        result = br.readLine();
+        result = result.substring(1,result.lastIndexOf("]"));
+        String[] fileList = result.split(", ");
+        for (String f:fileList) {
+            System.out.println("** "+f+" **");
+        };
+        System.out.println("** 총 "+fileList.length+"개의 파일 **");
     }
-    public void exit(Scanner scanner){
+    public void exit(Scanner scanner,Socket sc){
         scanner.close();
+        sc.close();
         System.out.println("** 접속이 종료되었습니다 **");
     }
 }

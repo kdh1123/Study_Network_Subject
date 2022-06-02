@@ -3,7 +3,7 @@ package kr.hs.dgsw.network.test01.n2106.server;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.Buffer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -57,6 +57,7 @@ public class FTPServer {
         System.out.println("로그인 함수 실행");
         BufferedReader br = new BufferedReader(new InputStreamReader(is));
         PrintWriter pw = new PrintWriter(os,true);
+        while(true){
         String id = br.readLine();
         String pass = br.readLine();
         if(userData.get(id).equals(pass)){
@@ -67,8 +68,8 @@ public class FTPServer {
         else {
             System.out.println("로그인 실패");
             pw.println("실패");
+            }
         }
-        return false;
     }
     public void upload(DataInputStream dis) throws IOException{
         String fileName = dis.readUTF();
@@ -83,14 +84,27 @@ public class FTPServer {
     }
     public List<String> fileList(){
         File file = new File(fileFolder);
-        List<String> list = null;
+        List<String> list = new ArrayList<String>();
         for (String f:file.list()) {
-            list.add(f+" "+f.length());
+            File current = new File(fileFolder +"/"+f);
+            long val = current.length();
+            String len = val + " B";
+            if(val > 1024){
+                val /= 1024;
+                len = val+"Kb";
+            }
+            if(val > 1024){
+                val /= 1024;
+                len = val+"Mb";
+            }
+            if(val > 1024){
+                val /= 1024;
+                len = val+"Gb";
+            }
+            list.add(f+" "+len);
         }
-        list.add("테스트");
         System.out.println(list);
         return list;
     }
-
 
 }
