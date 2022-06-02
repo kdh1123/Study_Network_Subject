@@ -13,6 +13,7 @@ public class FTPServer {
     private static final String PASS = "1234";
     private static final String fileFolder = "C:/Users/DGSW/Desktop/네트워크 받은 파일";
     private static boolean isLogin = false;
+    private static String answer;
 
 
 
@@ -37,12 +38,11 @@ public class FTPServer {
                     System.out.println("명령 프롬프트 진입");
                     while(true){
                         fun = br.readLine();
-                        System.out.println(fun);
                         if(fun.equals("파일목록")){
                             pw.println(server.fileList());
                         }
                         else if(fun.equals("업로드")){
-                            server.upload(os,dis);
+                            server.upload(is,os);
                         }
                         else if(fun.equals("다운로드")){
                             server.download();
@@ -72,39 +72,50 @@ public class FTPServer {
             }
         }
     }
-    public void upload(InputStream is,OutputStream os,DataInputStream dis) throws IOException{
+    public void upload(InputStream is,OutputStream os) throws IOException{
+        BufferedInputStream bir = new BufferedInputStream(is);
+        DataInputStream dis = new DataInputStream(bir);
         PrintWriter pw = new PrintWriter(os,true);
         BufferedReader br = new BufferedReader(new InputStreamReader(is));
+
+
         String fileName = dis.readUTF();
-        FileOutputStream fos = new FileOutputStream(fileFolder + "/"+fileName);
         File file = new File(fileFolder+"/"+fileName);
+        System.out.println(fileFolder+"/"+fileName);
+
         if(file.exists()){
             pw.println("중복");
-            String answer = br.readLine();
+            System.out.println("중복");
+            answer = br.readLine();
+            System.out.println("죽음" + answer);
             if(answer.equals("YES")){
+                FileOutputStream fos = new FileOutputStream(file);
+
                 int readSize = 0;
                 byte[] bytes = new byte[1024];
 
                 while ((readSize = dis.read(bytes)) != -1) {
                     fos.write(bytes, 0, readSize);
                 }
+                System.out.println("업로드 성공");
                 pw.println("성공");
             }
             else if(answer.equals("NO")){
+                System.out.println("취소");
                 pw.println("취소");
-            }
-            else{
-                pw.println("실패");
             }
         }
         else {
+            pw.println("성공");
+            System.out.println("업로드 성공");
+            FileOutputStream fos = new FileOutputStream(file);
+
             int readSize = 0;
             byte[] bytes = new byte[1024];
 
             while ((readSize = dis.read(bytes)) != -1) {
                 fos.write(bytes, 0, readSize);
             }
-            pw.println("성공");
         }
 
     }

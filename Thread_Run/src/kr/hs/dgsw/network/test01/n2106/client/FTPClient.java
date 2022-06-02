@@ -48,9 +48,10 @@ public class FTPClient {
 
                         else if (fun.equals("업로드")) {
                             String[] nameArray = scanner.nextLine().split(" ");
-                            name = nameArray[nameArray.length-1];
+                            name = nameArray[1];
+                            newName = nameArray[nameArray.length-1];
                             System.out.println(fun);
-                            client.upload(is, os, name);
+                            client.upload(is, os, name, newName);
                         }
 
                         else if (fun.equals("다운로드")) {
@@ -78,16 +79,19 @@ public class FTPClient {
 
         }
     }
-    public void upload(InputStream is, OutputStream os,String name) {
+    public void upload(InputStream is, OutputStream os,String name,String newName) {
         try{
             BufferedOutputStream bor = new BufferedOutputStream(os);
             DataOutputStream dos = new DataOutputStream(bor);
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
             Scanner scanner = new Scanner(System.in);
             PrintWriter pw = new PrintWriter(os,true);
-            dos.writeUTF(name);
+            pw.println("업로드");
             File f1 = new File(filefolder +"/"+name);
             FileInputStream fis = new FileInputStream(f1);
+
+            dos.writeUTF(newName);
+
             int readSize = 0;
             byte[] bytes = new byte[1024];
 
@@ -96,13 +100,15 @@ public class FTPClient {
             }
             String result = br.readLine();
             if(result.equals("성공")){
-                System.out.println("** "+name+" 파일이 성공적으로 업로드 되었습니다 **");
+                System.out.println("** "+name+"("+newName+") 파일이 성공적으로 업로드 되었습니다 **");
             }
             else if(result.equals("중복")){
                 System.out.println("** 같은 이름의 파일이 이미 존재합니다, 덮어쓰시겠습니까? (YES / NO) **");
                 String input = scanner.next();
+                System.out.println(input);
                 if(input.equals("YES") || input.equals("NO")){
                     pw.println(input);
+                    System.out.println("전송");
                 }
                 String answer = br.readLine();
                 if(answer.equals("성공")){
@@ -116,7 +122,7 @@ public class FTPClient {
                 }
             }
         } catch (FileNotFoundException e){
-            System.out.println("** "+name+"해당 파일을 찾을 수 없습니다 **");
+            System.out.println("** "+name+" 해당 파일을 찾을 수 없습니다 **");
         } catch (IOException e){
             e.printStackTrace();
         }
@@ -148,9 +154,10 @@ public class FTPClient {
     public void fileList(InputStream is, OutputStream os, String fun) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(is));
         PrintWriter pw = new PrintWriter(os,true);
+        System.out.println(fun);
         pw.println(fun);
         String result;
-        System.out.println("** File List **");
+        System.out.println("** [File List] **");
         result = br.readLine();
         result = result.substring(1,result.lastIndexOf("]"));
         String[] fileList = result.split(", ");
