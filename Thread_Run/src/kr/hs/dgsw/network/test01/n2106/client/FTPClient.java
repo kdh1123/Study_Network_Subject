@@ -2,6 +2,7 @@ package kr.hs.dgsw.network.test01.n2106.client;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.Buffer;
 import java.util.Scanner;
 
 public class FTPClient {
@@ -12,39 +13,31 @@ public class FTPClient {
     private static final String IP_ADDRESS = "10.80.163.89";
     private static final FTPClient client = new FTPClient();
     private static boolean isLogin = false;
-    private static OutputStream os;
-    private static InputStream is;
-    private static BufferedOutputStream bor;
-    private static DataOutputStream dos;
-    private static PrintWriter pw;
-    private static BufferedReader br;
-    private static final Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) throws IOException {
         System.out.println("** 서버에 접속하였습니다 **");
         String fun;
         String result;
+        Scanner scanner = new Scanner(System.in);
         while(true) {
             Socket sc = new Socket(IP_ADDRESS,PORT);
-            os = sc.getOutputStream();
-            is = sc.getInputStream();
-            bor = new BufferedOutputStream(os);
-            dos = new DataOutputStream(bor);
-            pw = new PrintWriter(os);
-            br = new BufferedReader(new InputStreamReader(is));
+            OutputStream os = sc.getOutputStream();
+            InputStream is = sc.getInputStream();
+            BufferedOutputStream bor = new BufferedOutputStream(os);
+            DataOutputStream dos = new DataOutputStream(bor);
+            PrintWriter pw = new PrintWriter(os,true);
+            BufferedReader br = new BufferedReader(new InputStreamReader(is));
             if(!isLogin)
-            client.login();
+            client.login(is,os,scanner);
             if(isLogin){
                 while(true){
+                    System.out.print("명령어 입력 : ");
                     fun = scanner.next();
-                    System.out.printf(fun.substring(0,0));
-                    if(fun.substring(0,0).equals("/")){
-                        fun = fun.substring(1);
-                        pw.println(fun);
-                        System.out.println("명령 입력");
-                    }
-                    result = br.readLine();
+                    if(fun.substring(0,1).equals("/")) fun = fun.substring(1);
+                    System.out.println(fun);
                     if(fun.equals("파일목록")){
+                        pw.println(fun);
+                        result = br.readLine();
                         System.out.println(result);
                     }
                     else if(fun.equals("업로드")){
@@ -72,15 +65,19 @@ public class FTPClient {
     public void upload(){
 
     }
-    public void login() throws IOException {
+    public void login(InputStream is, OutputStream os, Scanner scanner) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+        PrintWriter pw = new PrintWriter(os,true);
         while(true) {
-            System.out.printf("ID : ");
+            System.out.print("ID : ");
             pw.println(scanner.next());
-            System.out.printf("PASS : ");
+            System.out.print("PASS : ");
             pw.println(scanner.next());
             String success = br.readLine();
+            System.out.println(success);
             if (success.equals("성공")){
                 System.out.println("** FTP 서버에 접속했습니다 **");
+                isLogin = true;
                 break;
             }
             else if(success.equals("실패")){
