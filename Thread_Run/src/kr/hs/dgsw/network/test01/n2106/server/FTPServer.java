@@ -75,8 +75,8 @@ public class FTPServer {
     public void upload(InputStream is,OutputStream os) throws IOException{
         BufferedInputStream bir = new BufferedInputStream(is);
         DataInputStream dis = new DataInputStream(bir);
-        PrintWriter pw = new PrintWriter(os,true);
         BufferedReader br = new BufferedReader(new InputStreamReader(is));
+        PrintWriter pw = new PrintWriter(os,true);
 
 
         String fileName = dis.readUTF();
@@ -87,10 +87,9 @@ public class FTPServer {
             pw.println("중복");
             System.out.println("중복");
             answer = br.readLine();
-            System.out.println("죽음" + answer);
+            System.out.println(answer);
             if(answer.equals("YES")){
                 FileOutputStream fos = new FileOutputStream(file);
-
                 int readSize = 0;
                 byte[] bytes = new byte[1024];
 
@@ -117,7 +116,6 @@ public class FTPServer {
                 fos.write(bytes, 0, readSize);
             }
         }
-
     }
     public void download() throws IOException{
 

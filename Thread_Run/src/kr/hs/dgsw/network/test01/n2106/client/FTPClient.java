@@ -45,13 +45,17 @@ public class FTPClient {
                         if (fun.equals("파일목록")) {
                             client.fileList(is, os, fun);
                         }
-
                         else if (fun.equals("업로드")) {
-                            String[] nameArray = scanner.nextLine().split(" ");
-                            name = nameArray[1];
-                            newName = nameArray[nameArray.length-1];
-                            System.out.println(fun);
-                            client.upload(is, os, name, newName);
+                            try{
+                                String[] nameArray = scanner.nextLine().split(" ");
+                                name = nameArray[1];
+                                newName = nameArray[nameArray.length-1];
+                                System.out.println(fun);
+                                pw.println("업로드");
+                                client.upload(is, os, name, newName);
+                            } catch (ArrayIndexOutOfBoundsException e){
+                                System.out.println("** 잘못된 형식의 명령어입니다 **");
+                            }
                         }
 
                         else if (fun.equals("다운로드")) {
@@ -86,7 +90,6 @@ public class FTPClient {
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
             Scanner scanner = new Scanner(System.in);
             PrintWriter pw = new PrintWriter(os,true);
-            pw.println("업로드");
             File f1 = new File(filefolder +"/"+name);
             FileInputStream fis = new FileInputStream(f1);
 
@@ -105,7 +108,6 @@ public class FTPClient {
             else if(result.equals("중복")){
                 System.out.println("** 같은 이름의 파일이 이미 존재합니다, 덮어쓰시겠습니까? (YES / NO) **");
                 String input = scanner.next();
-                System.out.println(input);
                 if(input.equals("YES") || input.equals("NO")){
                     pw.println(input);
                     System.out.println("전송");
