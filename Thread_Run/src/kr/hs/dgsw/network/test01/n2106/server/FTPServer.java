@@ -80,6 +80,7 @@ public class FTPServer {
 
 
         String fileName = dis.readUTF();
+        dis.close();
         File file = new File(fileFolder+"/"+fileName);
         System.out.println(fileFolder+"/"+fileName);
 
@@ -100,8 +101,15 @@ public class FTPServer {
                 pw.println("성공");
             }
             else if(answer.equals("NO")){
-                System.out.println("취소");
-                pw.println("취소");
+                String[] fileNameEx = fileName.split(".");
+                for(int i=1;; i++) {
+                    fileName = fileNameEx[0] + "("+Integer.toString(i)+")" + fileNameEx[1];
+                    file = new File(fileFolder +"/"+ fileName);
+                    if(file.exists()) continue;
+                    break;
+                }
+                System.out.println("업로드 성공");
+                pw.println("성공");
             }
         }
         else {
