@@ -12,7 +12,7 @@ public class FTPClient {
     private static String pass;
     private static final String filefolder = "C:/Users/DGSW/Desktop/네트워크 보낼 파일";
     private static final int PORT = 5000;
-    private static final String IP_ADDRESS = "10.80.163.89";
+    private static final String IP_ADDRESS = "192.168.0.17";
     private static final FTPClient client = new FTPClient();
     private static boolean isLogin = false;
 
@@ -50,7 +50,6 @@ public class FTPClient {
                                 String[] nameArray = scanner.nextLine().split(" ");
                                 name = nameArray[1];
                                 newName = nameArray[nameArray.length-1];
-                                System.out.println(fun);
                                 pw.println("업로드");
                                 client.upload(is, os, name, newName);
                             } catch (ArrayIndexOutOfBoundsException e){
@@ -94,6 +93,7 @@ public class FTPClient {
             FileInputStream fis = new FileInputStream(f1);
 
             dos.writeUTF(newName);
+            System.out.println(newName);
 
             int readSize = 0;
             byte[] bytes = new byte[1024];
@@ -116,12 +116,6 @@ public class FTPClient {
                 if(answer.equals("성공")){
                     System.out.println("** "+name+" 파일이 성공적으로 업로드 되었습니다 **");
                 }
-                else if(answer.equals("취소")){
-                    System.out.println("** "+name+" 파일 업로드를 취소하였습니다 **");
-                }
-                else if(answer.equals("실패")){
-                    System.out.println("** "+name+" 파일 업로드를 실패하였습니다 **");
-                }
             }
         } catch (FileNotFoundException e){
             System.out.println("** "+name+" 해당 파일을 찾을 수 없습니다 **");
@@ -133,24 +127,30 @@ public class FTPClient {
         BufferedOutputStream bor = new BufferedOutputStream(os);
         DataOutputStream dos = new DataOutputStream(bor);
     }
-    public void login(InputStream is, OutputStream os, Scanner scanner) throws IOException {
+    public void login(InputStream is, OutputStream os, Scanner scanner) {
         BufferedReader br = new BufferedReader(new InputStreamReader(is));
         PrintWriter pw = new PrintWriter(os,true);
-        while(true) {
-            System.out.print("ID : ");
-            pw.println(scanner.next());
-            System.out.print("PASS : ");
-            pw.println(scanner.next());
-            String success = br.readLine();
-            System.out.println(success);
-            if (success.equals("성공")){
-                System.out.println("** FTP 서버에 접속했습니다 **");
-                isLogin = true;
-                break;
+        try{
+            while(true) {
+                System.out.print("ID : ");
+                pw.println(scanner.next());
+                System.out.print("PASS : ");
+                pw.println(scanner.next());
+                String success = br.readLine();
+                System.out.println(success);
+                if (success.equals("성공")){
+                    System.out.println("** FTP 서버에 접속했습니다 **");
+                    isLogin = true;
+                    break;
+                }
+                else if(success.equals("실패")){
+                    System.out.println("** 비밀번호 또는 아이디가 잘못되었습니다 **");
+                }
             }
-            else if(success.equals("실패")){
-                System.out.println("** 비밀번호 또는 아이디가 잘못되었습니다 **");
-            }
+        }catch (IOException e){
+            System.out.println("연결 실패");
+        }catch  (RuntimeException e){
+            System.out.println("런타임 초과");
         }
     }
     public void fileList(InputStream is, OutputStream os, String fun) throws IOException {
