@@ -31,7 +31,6 @@ public class FTPServer {
                     InputStream is = sc.getInputStream();
                     OutputStream os = sc.getOutputStream();
                     BufferedInputStream bir = new BufferedInputStream(is);
-                    DataInputStream dis = new DataInputStream(bir);
                     BufferedReader br = new BufferedReader(new InputStreamReader(is));
                     PrintWriter pw = new PrintWriter(os, true);
                     if (!isLogin) {
@@ -87,18 +86,16 @@ public class FTPServer {
             BufferedInputStream bir = new BufferedInputStream(is);
             DataInputStream dis = new DataInputStream(bir);
             PrintWriter pw = new PrintWriter(os,true);
+            BufferedReader br = new BufferedReader(new InputStreamReader(is));
 
             //파일 이름 받기
-            String fileName = dis.readUTF();
+            String fileName = br.readLine();
             File file = new File(fileFolder+"/"+fileName);
             System.out.println(fileFolder+"/"+fileName);
-            BufferedReader br = new BufferedReader(new InputStreamReader(is));
-            br.mark(0);
 
             if(file.exists()){
                 pw.println("중복");
                 System.out.println("중복");
-                br.reset();
                 String answer = br.readLine();
                 System.out.println(answer);
                 if(answer.equals("YES")){
@@ -113,15 +110,25 @@ public class FTPServer {
                     pw.println("성공");
                 }
                 else if(answer.equals("NO")){
-                    String[] fileNameEx = fileName.split(".");
+                    String[] fileNameEx = fileName.split("\\.");
                     for(int i=1;; i++) {
                         fileName = fileNameEx[0] + "("+Integer.toString(i)+")" + fileNameEx[1];
                         file = new File(fileFolder +"/"+ fileName);
                         if(file.exists()) continue;
                         break;
                     }
+                    FileOutputStream fos = new FileOutputStream(file);
+                    int readSize = 0;
+                    byte[] bytes = new byte[1024];
+
+                    while ((readSize = dis.read(bytes)) != -1) {
+                        fos.write(bytes, 0, readSize);
+                    }
                     System.out.println("업로드 성공");
                     pw.println("성공");
+                }
+                else {
+                    pw.println("실패");
                 }
             }
             else {
@@ -146,6 +153,10 @@ public class FTPServer {
         BufferedInputStream bir = new BufferedInputStream(is);
         DataInputStream dis = new DataInputStream(bir);
         PrintWriter pw = new PrintWriter(os,true);
+        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+
+        String request = br.readLine();
+
     }
     public List<String> fileList(){
         File file = new File(fileFolder);
