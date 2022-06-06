@@ -54,7 +54,6 @@ public class FTPServer {
                     }
                 }
             } catch (SocketException e) {
-                System.out.println("연결 끊어짐");
             } catch (IOException e) {
                 System.out.println("연결 실패");
             }
@@ -66,6 +65,7 @@ public class FTPServer {
         System.out.println("로그인 함수 실행");
         BufferedReader br = new BufferedReader(new InputStreamReader(is));
         PrintWriter pw = new PrintWriter(os,true);
+        pw.println("로그인");
         while(true){
         String id = br.readLine();
         String pass = br.readLine();
