@@ -12,7 +12,7 @@ public class FTPClient {
     private static String pass;
     private static final String filefolder = "C:/Users/DGSW/Desktop/네트워크 보낼 파일";
     private static final int PORT = 5000;
-    private static final String IP_ADDRESS = "10.80.162.2";
+    private static final String IP_ADDRESS = "10.80.162.88";
     private static final FTPClient client = new FTPClient();
     private static boolean isLogin = false;
     private static Socket sc;
@@ -91,31 +91,35 @@ public class FTPClient {
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
             Scanner scanner = new Scanner(System.in);
             PrintWriter pw = new PrintWriter(os,true);
+
             System.out.println(filefolder +"/"+name);
-            File f1 = new File(filefolder +"/"+name);
-            FileInputStream fis = new FileInputStream(f1);
+            File file = new File(filefolder +"/"+name);
+            FileInputStream fis = new FileInputStream(file);
 
             pw.println(newName);
             System.out.println(newName);
             String result = br.readLine();
+
+
+
             if(result.equals("성공")){
-                System.out.println("** "+name+"("+newName+") 파일이 성공적으로 업로드 되었습니다 **");
-            }
-            else if(result.equals("중복")) {
-                System.out.println("** 같은 이름의 파일이 이미 존재합니다, 덮어쓰시겠습니까? (YES / NO) **");
-                pw.println(scanner.next());
                 int readSize = 0;
                 byte[] bytes = new byte[1024];
 
                 while((readSize=fis.read(bytes)) != -1){
                     dos.write(bytes,0,readSize);
                 }
+                System.out.println("** "+name+"("+newName+") 파일이 성공적으로 업로드 되었습니다 **");
+            }
+            else if(result.equals("중복")) {
+                System.out.println("** 같은 이름의 파일이 이미 존재합니다, 덮어쓰시겠습니까? (YES / NO) **");
+                pw.println(scanner.next());
                 System.out.println("전송");
                 if (br.readLine().equals("성공")) {
                     System.out.println("** " + name + " 파일이 성공적으로 업로드 되었습니다 **");
                 }
                 else {
-                    System.out.println("파일 업로드 실패");
+                    System.out.println("** 파일 업로드 실패 **");
                 }
             }
         } catch (FileNotFoundException e){

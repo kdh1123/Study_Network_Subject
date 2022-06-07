@@ -12,7 +12,7 @@ import java.util.Map;
 public class FTPServer {
     private static final String ID = "test1";
     private static final String PASS = "1234";
-    private static final String fileFolder = "C:/Users/DGSW/Desktop/네트워크 받은 파일";
+    private static final String fileFolder = "C:/Users/DGSW/Desktop/네트워크 받은 파일/";
     private static boolean isLogin = false;
     private static Socket sc;
 
@@ -90,16 +90,15 @@ public class FTPServer {
 
             //파일 이름 받기
             String fileName = br.readLine();
-            File file = new File(fileFolder+"/"+fileName);
-            System.out.println(fileFolder+"/"+fileName);
+            File file = new File(fileFolder+fileName);
+            FileOutputStream fos = new FileOutputStream(file);
 
-            if(file.exists()){
+            if(new File(fileFolder + fileName).exists()){
                 pw.println("중복");
                 System.out.println("중복");
                 String answer = br.readLine();
-                System.out.println(answer);
                 if(answer.equals("YES")){
-                    FileOutputStream fos = new FileOutputStream(file);
+                    System.out.println(answer);
                     int readSize = 0;
                     byte[] bytes = new byte[1024];
 
@@ -110,19 +109,20 @@ public class FTPServer {
                     pw.println("성공");
                 }
                 else if(answer.equals("NO")){
+                    System.out.println(answer);
                     String[] fileNameEx = fileName.split("\\.");
                     for(int i=1;; i++) {
-                        fileName = fileNameEx[0] + "("+Integer.toString(i)+")" + fileNameEx[1];
-                        file = new File(fileFolder +"/"+ fileName);
+                        fileName = fileNameEx[0] + "("+i+")." + fileNameEx[1];
+                        file = new File(fileFolder + fileName);
                         if(file.exists()) continue;
                         break;
                     }
-                    FileOutputStream fos = new FileOutputStream(file);
+                    fos = new FileOutputStream(file);
                     int readSize = 0;
                     byte[] bytes = new byte[1024];
 
                     while ((readSize = dis.read(bytes)) != -1) {
-                        fos.write(bytes, 0, readSize);
+                        fos.write(bytes, 0 , readSize);
                     }
                     System.out.println("업로드 성공");
                     pw.println("성공");
@@ -134,7 +134,6 @@ public class FTPServer {
             else {
                 pw.println("성공");
                 System.out.println("업로드 성공");
-                FileOutputStream fos = new FileOutputStream(file);
 
                 int readSize = 0;
                 byte[] bytes = new byte[1024];
@@ -143,7 +142,11 @@ public class FTPServer {
                     fos.write(bytes, 0, readSize);
                 }
             }
-        }catch (IOException e){
+        } catch (SocketException e){
+            e.printStackTrace();
+        } catch (IOException e){
+            e.printStackTrace();
+        }catch (RuntimeException e){
             e.printStackTrace();
         }
     }

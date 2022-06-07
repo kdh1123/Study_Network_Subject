@@ -20,7 +20,7 @@ public class FileSendClient {
         byte[] bytes = new byte[1024];
 
         while((readSize=fis.read(bytes)) != -1){
-            dos.write(bytes,0,readSize);
+            dos.write(readSize);
         }
     }
 }
