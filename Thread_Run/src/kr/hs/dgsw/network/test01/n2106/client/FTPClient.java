@@ -1,5 +1,7 @@
 package kr.hs.dgsw.network.test01.n2106.client;
 
+import kr.hs.dgsw.network.test01.n2106.CommonFun;
+
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
@@ -16,72 +18,65 @@ public class FTPClient {
     private static final FTPClient client = new FTPClient();
     private static boolean isLogin = false;
     private static Socket sc;
+    Scanner scanner = new Scanner(System.in);
+    String fun;
+    String name, newName;
+    private CommonFun commonFun = new CommonFun(sc);
 
     public static void main(String[] args) throws IOException {
         System.out.println("** 서버에 접속하였습니다 **");
-        String fun;
-        String name, newName;
         Scanner scanner = new Scanner(System.in);
-        while(true) {
-            sc = new Socket(IP_ADDRESS,PORT);
-            OutputStream os = sc.getOutputStream();
-            InputStream is = sc.getInputStream();
-            PrintWriter pw = new PrintWriter(os,true);
-            BufferedReader br = new BufferedReader(new InputStreamReader(is));
+        FTPClient client = new FTPClient();
+        client.execute();
+    }
 
-            if(br.readLine().equals("로그인"))
-            client.login(is,os,scanner);
+    public void execute() throws IOException{
+        sc = new Socket(IP_ADDRESS,PORT);
+
+        if(commonFun.receiveMSG().equals("로그인"))
+
+            client.login();
+
+        if(isLogin){
+            while(true) {
+                fun = scanner.next();
 
 
-            if(isLogin){
-                while(true) {
-                    fun = scanner.next();
+                if (fun.startsWith("/")) {
 
+                    fun = fun.substring(1);
 
-                    if (fun.startsWith("/")) {
-
-                        fun = fun.substring(1);
-
-                        if (fun.equals("파일목록")) {
-                            client.fileList(is, os, fun);
+                    if (fun.equals("파일목록")) {
+                        client.fileList(is, os, fun);
+                    }
+                    else if (fun.equals("업로드")) {
+                        try{
+                            String[] nameArray = scanner.nextLine().split(" ");
+                            name = nameArray[1];
+                            newName = nameArray[nameArray.length-1];
+                            pw.println("업로드");
+                            client.upload(name, newName);
+                        } catch (ArrayIndexOutOfBoundsException e){
+                            System.out.println("** 잘못된 형식의 명령어입니다 **");
                         }
-                        else if (fun.equals("업로드")) {
-                            try{
-                                String[] nameArray = scanner.nextLine().split(" ");
-                                name = nameArray[1];
-                                newName = nameArray[nameArray.length-1];
-                                pw.println("업로드");
-                                client.upload(name, newName);
-                            } catch (ArrayIndexOutOfBoundsException e){
-                                System.out.println("** 잘못된 형식의 명령어입니다 **");
-                            }
-                        }
+                    }
 
-                        else if (fun.equals("다운로드")) {
-                            name = "";
-                            client.download(name);
-                        }
+                    else if (fun.equals("다운로드")) {
+                        name = "";
+                        client.download(name);
+                    }
 
-                        else if (fun.equals("접속종료")) {
-                            client.exit(scanner, sc);
-                        }
+                    else if (fun.equals("접속종료")) {
+                        client.exit(scanner, sc);
+                    }
 
-                        else {
-                            System.out.println("** 지원하지 않는 명령어입니다 **");
-                        }
+                    else {
+                        System.out.println("** 지원하지 않는 명령어입니다 **");
                     }
                 }
             }
-
-
-            //int readSize = 0;
-            //byte[] bytes = new byte[1024];
-
-            //while ((readSize = fis.read(bytes)) != -1) {
-              //  dos.write(bytes, 0, readSize);
-            //}
-
         }
+
     }
     public void upload(String name,String newName) {
         try{
@@ -164,7 +159,7 @@ public class FTPClient {
             e.printStackTrace();
         }
     }
-    public void login(InputStream is, OutputStream os, Scanner scanner) {
+    public void login() {
         BufferedReader br = new BufferedReader(new InputStreamReader(is));
         PrintWriter pw = new PrintWriter(os,true);
         try{
