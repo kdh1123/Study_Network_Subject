@@ -9,53 +9,64 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class FTPServer {
+public class FTPServer extends Thread{
     private static final String ID = "test1";
     private static final String PASS = "1234";
     private static final String fileFolder = "C:/Users/DGSW/Desktop/네트워크 받은 파일/";
     private static boolean isLogin = false;
     private static Socket sc;
 
+    public FTPServer(ServerSocket ss){
+       try {
+           sc = ss.accept();
+       }catch (IOException e){
+           e.printStackTrace();
+       }
+    }
 
+    @Override
+    public void run(){
 
-    public static void main(String[] args) {
-        FTPServer server = new FTPServer();
-        while(true) {
-            try {
-                ServerSocket ss = new ServerSocket(5000);
-                String fun;
-                String fileName;
-                boolean isExit = false;
-                while (!isExit) {
-                    sc = ss.accept();
-                    InputStream is = sc.getInputStream();
-                    OutputStream os = sc.getOutputStream();
-                    BufferedInputStream bir = new BufferedInputStream(is);
-                    BufferedReader br = new BufferedReader(new InputStreamReader(is));
-                    PrintWriter pw = new PrintWriter(os, true);
-                    if (!isLogin) {
-                        isLogin = server.login();
-                    }
-                    if (isLogin) {
-                        System.out.println("명령 프롬프트 진입");
-                        while (true) {
-                            fun = br.readLine();
-                            if (fun.equals("파일목록")) {
-                                pw.println(server.fileList());
-                            } else if (fun.equals("업로드")) {
-                                server.upload();
-                            } else if (fun.equals("다운로드")) {
-                                server.download();
-                            } else if (fun.equals("접속종료")) {
-                                isExit = true;
-                            }
-                        }
+        try {
+            String fun;
+            String fileName;
+            InputStream is = sc.getInputStream();
+            OutputStream os = sc.getOutputStream();
+            BufferedInputStream bir = new BufferedInputStream(is);
+            BufferedReader br = new BufferedReader(new InputStreamReader(is));
+            PrintWriter pw = new PrintWriter(os, true);
+            if (!isLogin) {
+                isLogin = this.login();
+            }
+            if (isLogin) {
+                System.out.println("명령 프롬프트 진입");
+                while (true) {
+                    fun = br.readLine();
+                    if (fun.equals("파일목록")) {
+                        pw.println(this.fileList());
+                    } else if (fun.equals("업로드")) {
+                        this.upload();
+                    } else if (fun.equals("다운로드")) {
+                        this.download();
+                    } else if (fun.equals("접속종료")) {
+
                     }
                 }
-            } catch (SocketException e) {
-            } catch (IOException e) {
-                System.out.println("연결 실패");
             }
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    public static void main(String[] args) {
+        try {
+            ServerSocket ss = new ServerSocket(5000);
+            boolean isExit = false;
+            Thread ftpServer = new FTPServer(ss);
+            ftpServer.start();
+        } catch (SocketException e) {
+        } catch (IOException e) {
+            System.out.println("연결 실패");
         }
     }
     public boolean login() throws IOException,RuntimeException {
@@ -91,7 +102,6 @@ public class FTPServer {
             //파일 이름 받기
             String fileName = br.readLine();
             File file = new File(fileFolder+fileName);
-            FileOutputStream fos = new FileOutputStream(file);
 
             if(new File(fileFolder + fileName).exists()){
                 pw.println("중복");
@@ -99,12 +109,7 @@ public class FTPServer {
                 String answer = br.readLine();
                 if(answer.equals("YES")){
                     System.out.println(answer);
-                    int readSize = 0;
-                    byte[] bytes = new byte[1024];
-
-                    while ((readSize = dis.read(bytes)) != -1) {
-                        fos.write(bytes, 0, readSize);
-                    }
+                    this.fileInPut(file);
                     System.out.println("업로드 성공");
                     pw.println("성공");
                 }
@@ -117,13 +122,7 @@ public class FTPServer {
                         if(file.exists()) continue;
                         break;
                     }
-                    fos = new FileOutputStream(file);
-                    int readSize = 0;
-                    byte[] bytes = new byte[1024];
-
-                    while ((readSize = dis.read(bytes)) != -1) {
-                        fos.write(bytes, 0 , readSize);
-                    }
+                    this.fileInPut(file);
                     System.out.println("업로드 성공");
                     pw.println("성공");
                 }
@@ -132,15 +131,30 @@ public class FTPServer {
                 }
             }
             else {
+                this.fileInPut(file);
                 pw.println("성공");
                 System.out.println("업로드 성공");
+            }
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+    public void download() throws IOException{
+        try{
+            InputStream is = sc.getInputStream();
+            OutputStream os = sc.getOutputStream();
+            BufferedOutputStream bor = new BufferedOutputStream(os);
+            DataOutputStream dos = new DataOutputStream(bor);
+            PrintWriter pw = new PrintWriter(os,true);
+            BufferedReader br = new BufferedReader(new InputStreamReader(is));
 
-                int readSize = 0;
-                byte[] bytes = new byte[1024];
+            //파일 이름 받기
+            String fileName = br.readLine();
+            File file = new File(fileFolder+fileName);
 
-                while ((readSize = dis.read(bytes)) != -1) {
-                    fos.write(bytes, 0, readSize);
-                }
+            if(file.exists()) {
+                this.fileOutPut(file);
+                pw.println("성공");
             }
         } catch (SocketException e){
             e.printStackTrace();
@@ -149,16 +163,6 @@ public class FTPServer {
         }catch (RuntimeException e){
             e.printStackTrace();
         }
-    }
-    public void download() throws IOException{
-        InputStream is = sc.getInputStream();
-        OutputStream os = sc.getOutputStream();
-        BufferedInputStream bir = new BufferedInputStream(is);
-        DataInputStream dis = new DataInputStream(bir);
-        PrintWriter pw = new PrintWriter(os,true);
-        BufferedReader br = new BufferedReader(new InputStreamReader(is));
-
-        String request = br.readLine();
 
     }
     public List<String> fileList(){
@@ -184,6 +188,39 @@ public class FTPServer {
         }
         System.out.println(list);
         return list;
+    }
+    public void fileInPut(File file){
+        try {
+            InputStream is = sc.getInputStream();
+            OutputStream os = sc.getOutputStream();
+            BufferedInputStream bir = new BufferedInputStream(is);
+            DataInputStream dis = new DataInputStream(bir);
+            FileOutputStream fos = new FileOutputStream(file);
+            int readSize = 0;
+            byte[] bytes = new byte[1024];
+
+            do {
+                fos.write(bytes, 0, readSize);
+            } while ((readSize = dis.read(bytes)) == 1024);
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+    public void fileOutPut(File file){
+        try{
+            InputStream is = sc.getInputStream();
+            OutputStream os = sc.getOutputStream();
+            BufferedOutputStream bor = new BufferedOutputStream(os);
+            DataOutputStream dos = new DataOutputStream(bor);
+            FileInputStream fis = new FileInputStream(file);
+            int readSize = 0;
+            byte[] bytes = new byte[1024];
+            do {
+                dos.write(bytes, 0, readSize);
+            } while ((readSize = fis.read(bytes)) == 1024);
+        }catch (IOException e){
+            e.printStackTrace();
+        }
     }
 
 }

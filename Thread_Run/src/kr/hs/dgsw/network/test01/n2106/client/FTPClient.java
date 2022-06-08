@@ -12,7 +12,7 @@ public class FTPClient {
     private static String pass;
     private static final String filefolder = "C:/Users/DGSW/Desktop/네트워크 보낼 파일";
     private static final int PORT = 5000;
-    private static final String IP_ADDRESS = "10.80.162.88";
+    private static final String IP_ADDRESS = "10.80.162.101";
     private static final FTPClient client = new FTPClient();
     private static boolean isLogin = false;
     private static Socket sc;
@@ -58,7 +58,8 @@ public class FTPClient {
                         }
 
                         else if (fun.equals("다운로드")) {
-                            client.download();
+                            name = "";
+                            client.download(name);
                         }
 
                         else if (fun.equals("접속종료")) {
@@ -103,18 +104,13 @@ public class FTPClient {
 
 
             if(result.equals("성공")){
-                int readSize = 0;
-                byte[] bytes = new byte[1024];
-
-                while((readSize=fis.read(bytes)) != -1){
-                    dos.write(bytes,0,readSize);
-                }
+                client.fileOutPut(file);
                 System.out.println("** "+name+"("+newName+") 파일이 성공적으로 업로드 되었습니다 **");
             }
             else if(result.equals("중복")) {
                 System.out.println("** 같은 이름의 파일이 이미 존재합니다, 덮어쓰시겠습니까? (YES / NO) **");
                 pw.println(scanner.next());
-                System.out.println("전송");
+                client.fileOutPut(file);
                 if (br.readLine().equals("성공")) {
                     System.out.println("** " + name + " 파일이 성공적으로 업로드 되었습니다 **");
                 }
@@ -128,13 +124,43 @@ public class FTPClient {
             e.printStackTrace();
         }
     }
-    public void download(){
+    public void download(String name){
         try{
             OutputStream os = sc.getOutputStream();
             InputStream is = sc.getInputStream();
-            BufferedOutputStream bor = new BufferedOutputStream(os);
-            DataOutputStream dos = new DataOutputStream(bor);
-        }catch (IOException e){
+            BufferedInputStream bir = new BufferedInputStream(is);
+            DataInputStream dis = new DataInputStream(bir);
+            BufferedReader br = new BufferedReader(new InputStreamReader(is));
+            Scanner scanner = new Scanner(System.in);
+            PrintWriter pw = new PrintWriter(os,true);
+
+            System.out.println(filefolder +"/"+name);
+            File file = new File(filefolder +"/"+name);
+
+            pw.println(name);
+            System.out.println(name);
+            String result = br.readLine();
+
+
+
+            if(result.equals("성공")){
+                client.fileInPut(file);
+                System.out.println("** "+name+"() 파일이 성공적으로 업로드 되었습니다 **");
+            }
+            else if(result.equals("중복")) {
+                System.out.println("** 같은 이름의 파일이 이미 존재합니다, 덮어쓰시겠습니까? (YES / NO) **");
+                pw.println(scanner.next());
+                client.fileInPut(file);
+                if (br.readLine().equals("성공")) {
+                    System.out.println("** " + name + " 파일이 성공적으로 업로드 되었습니다 **");
+                }
+                else {
+                    System.out.println("** 파일 업로드 실패 **");
+                }
+            }
+        } catch (FileNotFoundException e){
+            System.out.println("** "+name+" 해당 파일을 찾을 수 없습니다 **");
+        } catch (IOException e){
             e.printStackTrace();
         }
     }
@@ -183,5 +209,39 @@ public class FTPClient {
         scanner.close();
         sc.close();
         System.out.println("** 접속이 종료되었습니다 **");
+    }
+    public void fileInPut(File file){
+        try {
+            InputStream is = sc.getInputStream();
+            OutputStream os = sc.getOutputStream();
+            BufferedInputStream bir = new BufferedInputStream(is);
+            DataInputStream dis = new DataInputStream(bir);
+            FileOutputStream fos = new FileOutputStream(file);
+            int readSize = 0;
+            byte[] bytes = new byte[1024];
+
+            do {
+                fos.write(bytes, 0, readSize);
+            } while ((readSize = dis.read(bytes)) == 1024);
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+    public void fileOutPut(File file){
+        try{
+            InputStream is = sc.getInputStream();
+            OutputStream os = sc.getOutputStream();
+            BufferedOutputStream bor = new BufferedOutputStream(os);
+            DataOutputStream dos = new DataOutputStream(bor);
+            FileInputStream fis = new FileInputStream(file);
+            int readSize = 0;
+            byte[] bytes = new byte[1024];
+            while ((readSize = fis.read(bytes)) != -1){
+                dos.write(bytes, 0, readSize);
+            };
+            dos.flush();
+        }catch (IOException e){
+            e.printStackTrace();
+        }
     }
 }
