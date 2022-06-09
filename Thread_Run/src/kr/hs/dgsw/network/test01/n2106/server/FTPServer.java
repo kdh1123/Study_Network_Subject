@@ -32,8 +32,8 @@ public class FTPServer extends Thread{
                 isLogin = this.login();
             }
             if (isLogin) {
-                System.out.println("명령 프롬프트 진입");
                 while (true) {
+                    System.out.println("명령 대기");
                     String fun = commonFun.receiveMSG();
                     if (fun.equals("파일목록")) {
                         commonFun.sendMSG(this.fileList().toString());
@@ -68,10 +68,13 @@ public class FTPServer extends Thread{
     }
     public boolean login() throws IOException,RuntimeException {
         System.out.println("로그인 함수 실행");
-        commonFun.sendMSG("로그인");
         while(true){
         String id = commonFun.receiveMSG();
+            System.out.println(id);
         String pass = commonFun.receiveMSG();
+
+            System.out.println(id);
+            System.out.println(pass);
 
         //로그인 성공 여부 반환
         if(ID.equals(id) && PASS.equals(pass)){
@@ -94,12 +97,13 @@ public class FTPServer extends Thread{
             commonFun.sendMSG("중복");
             System.out.println("중복");
 
-            String answer = commonFun.receiveMSG();
+            String answer =
+                    commonFun.receiveMSG();
 
             if(answer.equals("YES")){
 
                 System.out.println(answer);
-                commonFun.sendFile(file);
+                commonFun.receiveFile(file);
 
                 System.out.println("업로드 성공");
                 commonFun.sendMSG("성공");
@@ -115,7 +119,7 @@ public class FTPServer extends Thread{
                     break;
                 }
 
-                commonFun.sendFile(file);
+                commonFun.receiveFile(file);
 
                 System.out.println("업로드 성공");
                 commonFun.sendMSG("성공");
@@ -125,25 +129,24 @@ public class FTPServer extends Thread{
             }
         }
         else {
-            commonFun.sendFile(file);
+            commonFun.receiveFile(file);
 
             commonFun.sendMSG("성공");
             System.out.println("업로드 성공");
         }
     }
-    public void download() throws IOException{
-        try{
+    public void download(){
 
-            //파일 이름 받기
-            String fileName = commonFun.receiveMSG();
-            File file = new File(FILE_FOLDER+fileName);
+        //파일 이름 받기
+        String fileName = commonFun.receiveMSG();
+        File file = new File(FILE_FOLDER+fileName);
 
-            if(file.exists()) {
-                commonFun.sendFile(file);
-                commonFun.sendMSG("성공");
-            }
-        } catch (RuntimeException e){
-            e.printStackTrace();
+        if(file.exists()) {
+            commonFun.sendFile(file);
+            commonFun.sendMSG("성공");
+        }
+        else{
+            commonFun.sendMSG("실패");
         }
 
     }

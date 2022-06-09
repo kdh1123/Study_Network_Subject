@@ -17,9 +17,9 @@ public class CommonFun {
             is = sc.getInputStream();
             os = sc.getOutputStream();
             bir = new BufferedInputStream(is);
+            bor = new BufferedOutputStream(os);
             dis = new DataInputStream(bir);
             dos = new DataOutputStream(bor);
-            bor = new BufferedOutputStream(os);
         }catch (IOException e){
             e.printStackTrace();
         }
@@ -45,7 +45,9 @@ public class CommonFun {
             while((readSize = fis.read(bytes)) != -1) {
                 dos.write(bytes, 0, readSize);
             }
-        }catch (IOException e){
+        } catch (FileNotFoundException e){
+            e.printStackTrace();
+        } catch (IOException e){
             e.printStackTrace();
         }
     }
@@ -53,14 +55,15 @@ public class CommonFun {
         try{
         return dis.readUTF();
         }catch (Exception e){
-            return "";
+            return "error";
         }
     }
     public void sendMSG(String str){
         try{
             dos.writeUTF(str);
+            System.out.println("전송 : " + str);
             dos.flush();
-        }catch (Exception e){
+        }catch (IOException e){
             System.out.println(str+" 실패");
         }
     }
