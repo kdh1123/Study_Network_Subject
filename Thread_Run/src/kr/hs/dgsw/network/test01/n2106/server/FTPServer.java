@@ -14,7 +14,7 @@ public class FTPServer extends Thread{
     private static final String PASS = "1234";
     private static final String FILE_FOLDER = "C:/Users/DGSW/Desktop/네트워크 받은 파일/";
     private boolean isLogin = false;
-    private static Thread ftpServer;
+    private static List<Thread> list;
 
     private Socket sc;
     private CommonFun commonFun;
@@ -45,7 +45,7 @@ public class FTPServer extends Thread{
                     } else if (fun.equals("다운로드")) {
                         this.download();
                     } else if (fun.equals("접속종료")) {
-                        this.ftpServer.stop();
+                        list.remove(this);
                     }
                 }
             }
@@ -57,9 +57,13 @@ public class FTPServer extends Thread{
     public static void main(String[] args) {
         try {
             ServerSocket ss = new ServerSocket(5000);
-            boolean isExit = false;
-            ftpServer = new FTPServer(ss);
-            ftpServer.start();
+            ss.setReuseAddress(true);
+            list = new ArrayList<Thread>();
+            while(true) {
+                Thread ftpServer = new FTPServer(ss);
+                list.add(ftpServer);
+                ftpServer.start();
+            }
         } catch (SocketException e) {
         } catch (IOException e) {
             System.out.println("연결 실패");

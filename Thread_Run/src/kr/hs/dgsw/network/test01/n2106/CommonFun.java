@@ -7,33 +7,35 @@ public class CommonFun {
     private Socket sc;
     private OutputStream os;
     private InputStream is;
-    private BufferedInputStream bir;
-    private DataInputStream dis;
-    BufferedOutputStream bor;
+    BufferedInputStream bis;
+    DataInputStream dis;
+    BufferedOutputStream bos;
     DataOutputStream dos;
+    FileOutputStream fos;
+    FileInputStream fis;
     public CommonFun(Socket sc){
         this.sc = sc;
         try{
             is = sc.getInputStream();
             os = sc.getOutputStream();
-            bir = new BufferedInputStream(is);
-            bor = new BufferedOutputStream(os);
-            dis = new DataInputStream(bir);
-            dos = new DataOutputStream(bor);
+            dis = new DataInputStream(is);
+            dos = new DataOutputStream(os);
         }catch (IOException e){
             e.printStackTrace();
         }
     }
     public void receiveFile(File file){
+
         try {
-            FileOutputStream fos = new FileOutputStream(file);
+            fos = new FileOutputStream(file);
+            bis = new BufferedInputStream(dis);
+            bos = new BufferedOutputStream(fos);
             System.out.println("받을 파일 : "+file);
             int readSize = 0;
             byte[] bytes = new byte[1024];
 
-            while ((readSize = dis.read(bytes)) != -1){
-                fos.write(bytes, 0, readSize);
-                System.out.println(bytes);
+            while ((readSize = bis.read(bytes)) > 0){
+                bos.write(bytes, 0, readSize);
             }
             System.out.println("파일 받음");
         }catch (IOException e){
@@ -42,11 +44,13 @@ public class CommonFun {
     }
     public void sendFile(File file){
         try{
-            FileInputStream fis = new FileInputStream(file);
+            fis = new FileInputStream(file);
+            bos = new BufferedOutputStream(dos);
+            bis = new BufferedInputStream(fis);
             System.out.println("보낼 파일 : "+file);
             int readSize = 0;
             byte[] bytes = new byte[1024];
-            while((readSize = fis.read(bytes)) != -1) {
+            while((readSize = bis.read(bytes)) > 0) {
                 dos.write(bytes, 0, readSize);
             }
             System.out.println("파일 보냄");
