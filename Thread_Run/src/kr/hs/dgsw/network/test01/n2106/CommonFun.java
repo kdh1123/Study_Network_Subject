@@ -27,12 +27,15 @@ public class CommonFun {
     public void receiveFile(File file){
         try {
             FileOutputStream fos = new FileOutputStream(file);
+            System.out.println("받을 파일 : "+file);
             int readSize = 0;
             byte[] bytes = new byte[1024];
 
             while ((readSize = dis.read(bytes)) != -1){
                 fos.write(bytes, 0, readSize);
+                System.out.println(bytes);
             }
+            System.out.println("파일 받음");
         }catch (IOException e){
             e.printStackTrace();
         }
@@ -40,11 +43,14 @@ public class CommonFun {
     public void sendFile(File file){
         try{
             FileInputStream fis = new FileInputStream(file);
+            System.out.println("보낼 파일 : "+file);
             int readSize = 0;
             byte[] bytes = new byte[1024];
             while((readSize = fis.read(bytes)) != -1) {
                 dos.write(bytes, 0, readSize);
             }
+            System.out.println("파일 보냄");
+            fis.close();
         } catch (FileNotFoundException e){
             e.printStackTrace();
         } catch (IOException e){

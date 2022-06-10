@@ -12,9 +12,9 @@ import java.util.Scanner;
 public class FTPClient {
     private static String id;
     private static String pass;
-    private static final String FILE_FOLDER = "C:/Users/DGSW/Desktop/네트워크 보낼 파일";
+    private static final String FILE_FOLDER = "C:/Users/DGSW/Desktop/네트워크 보낼 파일/";
     private static final int PORT = 5000;
-    private static final String IP_ADDRESS = "10.80.162.101";
+    private static final String IP_ADDRESS = "192.168.35.149";
     private static FTPClient client;
     private static boolean isLogin = false;
     private static Socket sc;
@@ -44,6 +44,7 @@ public class FTPClient {
 
         if(isLogin){
             while(true) {
+                System.out.println("명령 대기");
                 fun = scanner.next();
 
 
@@ -68,6 +69,7 @@ public class FTPClient {
 
                     else if (fun.equals("다운로드")) {
                         name = scanner.next();
+                        commonFun.sendMSG(fun);
                         client.download(name);
                     }
 
@@ -87,8 +89,7 @@ public class FTPClient {
         try{
             Scanner scanner = new Scanner(System.in);
 
-            System.out.println(FILE_FOLDER +"/"+name);
-            File file = new File(FILE_FOLDER +"/"+name);
+            File file = new File(FILE_FOLDER +name);
             FileInputStream fis = new FileInputStream(file);
 
             commonFun.sendMSG(newName);
@@ -114,14 +115,15 @@ public class FTPClient {
                 }
             }
         } catch (FileNotFoundException e){
+            commonFun.sendMSG("실패");
             System.out.println("** "+name+" 해당 파일을 찾을 수 없습니다 **");
         }
     }
     public void download(String name){
             Scanner scanner = new Scanner(System.in);
 
-            System.out.println(FILE_FOLDER +"/"+name);
-            File file = new File(FILE_FOLDER +"/"+name);
+            System.out.println(FILE_FOLDER +name);
+            File file = new File(FILE_FOLDER +name);
 
             commonFun.sendMSG(name);
             String result = commonFun.receiveMSG();

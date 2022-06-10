@@ -14,6 +14,7 @@ public class FTPServer extends Thread{
     private static final String PASS = "1234";
     private static final String FILE_FOLDER = "C:/Users/DGSW/Desktop/네트워크 받은 파일/";
     private boolean isLogin = false;
+    private static Thread ftpServer;
 
     private Socket sc;
     private CommonFun commonFun;
@@ -26,7 +27,8 @@ public class FTPServer extends Thread{
            e.printStackTrace();
        }
     }
-    public void execute(){
+    @Override
+    public void run(){
         try {
             if (!isLogin) {
                 isLogin = this.login();
@@ -35,6 +37,7 @@ public class FTPServer extends Thread{
                 while (true) {
                     System.out.println("명령 대기");
                     String fun = commonFun.receiveMSG();
+                    System.out.println(fun);
                     if (fun.equals("파일목록")) {
                         commonFun.sendMSG(this.fileList().toString());
                     } else if (fun.equals("업로드")) {
@@ -42,7 +45,7 @@ public class FTPServer extends Thread{
                     } else if (fun.equals("다운로드")) {
                         this.download();
                     } else if (fun.equals("접속종료")) {
-
+                        this.ftpServer.stop();
                     }
                 }
             }
@@ -50,16 +53,12 @@ public class FTPServer extends Thread{
             e.printStackTrace();
         }
     }
-    @Override
-    public void run(){
-        execute();
-    }
 
     public static void main(String[] args) {
         try {
             ServerSocket ss = new ServerSocket(5000);
             boolean isExit = false;
-            Thread ftpServer = new FTPServer(ss);
+            ftpServer = new FTPServer(ss);
             ftpServer.start();
         } catch (SocketException e) {
         } catch (IOException e) {
@@ -90,55 +89,55 @@ public class FTPServer extends Thread{
     public void upload(){
         //파일 이름 받기
         String fileName = commonFun.receiveMSG();
-        File file = new File(FILE_FOLDER+fileName);
+        if(!fileName.equals("실패")) {
+            File file = new File(FILE_FOLDER + fileName);
 
-        if(new File(FILE_FOLDER + fileName).exists()){
-            //중복일 때,
-            commonFun.sendMSG("중복");
-            System.out.println("중복");
+            if (file.exists()) {
+                //중복일 때,
+                commonFun.sendMSG("중복");
+                System.out.println("중복");
 
-            String answer =
-                    commonFun.receiveMSG();
+                String answer =
+                        commonFun.receiveMSG();
 
-            if(answer.equals("YES")){
+                if (answer.equals("YES")) {
 
-                System.out.println(answer);
-                commonFun.receiveFile(file);
+                    System.out.println(answer);
+                    commonFun.receiveFile(file);
 
-                System.out.println("업로드 성공");
-                commonFun.sendMSG("성공");
-            }
-            else if(answer.equals("NO")){
-                System.out.println(answer);
+                    System.out.println("업로드 성공");
+                    commonFun.sendMSG("성공");
+                } else if (answer.equals("NO")) {
+                    System.out.println(answer);
 
-                String[] fileNameEx = fileName.split("\\.");
-                for(int i=1;; i++) {
-                    fileName = fileNameEx[0] + "("+i+")." + fileNameEx[1];
-                    file = new File(FILE_FOLDER + fileName);
-                    if(file.exists()) continue;
-                    break;
+                    String[] fileNameEx = fileName.split("\\.");
+                    for (int i = 1; ; i++) {
+                        fileName = fileNameEx[0] + "(" + i + ")." + fileNameEx[1];
+                        file = new File(FILE_FOLDER + fileName);
+                        if (file.exists()) continue;
+                        break;
+                    }
+
+                    commonFun.receiveFile(file);
+
+                    System.out.println("업로드 성공");
+                    commonFun.sendMSG("성공");
+                } else {
+                    commonFun.sendMSG("실패");
                 }
-
+            } else {
                 commonFun.receiveFile(file);
 
-                System.out.println("업로드 성공");
                 commonFun.sendMSG("성공");
+                System.out.println("업로드 성공");
             }
-            else {
-                commonFun.sendMSG("실패");
-            }
-        }
-        else {
-            commonFun.receiveFile(file);
-
-            commonFun.sendMSG("성공");
-            System.out.println("업로드 성공");
         }
     }
     public void download(){
 
         //파일 이름 받기
         String fileName = commonFun.receiveMSG();
+        System.out.println(fileName);
         File file = new File(FILE_FOLDER+fileName);
 
         if(file.exists()) {
