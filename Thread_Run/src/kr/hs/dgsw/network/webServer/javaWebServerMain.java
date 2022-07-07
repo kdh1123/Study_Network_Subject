@@ -125,11 +125,12 @@ public class javaWebServerMain {
                 sb.append("       <title>Example</title>");
                 sb.append("   </head>");
                 sb.append("   <body>");
-                sb.append("       <h5>Hello, HttpServer!!!</h5>");
+                sb.append("       <h1>김도현입니다.</h1>");
                 sb.append("       <span>Method: "+(exchange.getRequestMethod())+"</span></br>");
                 sb.append("       <span>URI: "+(exchange.getRequestURI())+"</span></br>");
                 sb.append("       <span>PATH: "+(exchange.getRequestURI().getPath())+"</span></br>");
                 sb.append("       <span>QueryString: "+(exchange.getRequestURI().getQuery())+"</span></br>");
+                sb.append("       <p>예 그렇습니다. 김도현입니다. 위에 있는 건 어딘가 쓸데가 있나 싶어 안 지웠습니다. 봐주셔서 감사합니다.</p>");
                 sb.append("   </body>");
                 sb.append("</html>");
 
